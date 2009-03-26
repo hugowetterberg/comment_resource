@@ -1,0 +1,95 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_autoload_info().
+ */
+function comment_resource_autoload_info() {
+  return array(
+    'CommentResourceFeedModel' => array(
+      'file' => 'CommentResourceFeedModel.inc',
+    ),
+    'CommentQueryBuilder' => array(
+      'file' => 'CommentQueryBuilder.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_service_resource().
+ */
+function comment_resource_service_resource() {
+  // The resource definitions are cached quite heavily, so we'll
+  // perform a lazy load of the resource definition from a dedicated inc file.
+  module_load_include('resource.inc', 'comment_resource');
+  return _comment_resource_service_resource();
+}
+
+/**
+ * Implementation of hook_service_resources_alter().
+ *
+ * Adds the comments relationship to the node resource.
+ */
+function comment_resource_service_resources_alter(&$resources) {
+  if (isset($resources['node'])) {
+    module_load_include('resource.inc', 'comment_resource');
+    $resources['node']['#relationships']['comments'] = _comment_resource_node_comments();
+  }
+}
+
+/**
+ * Access check callback for comment controllers.
+ */
+function _comment_resource_access($op='view', $args=array()) {
+  if (user_access('administer comments')) {
+    return TRUE;
+  }
+
+  if ($op=='create') {
+    $comment = (object)$args[0];
+  }
+  else {
+    $comment = _comment_load($args[0]);
+  }
+
+  switch ($op) {
+    case 'view':
+      // Check if the user has access to comments and that the node has comments enabled
+      return $comment->status && user_access('access comments') && _comment_resource_node_access($comment->nid);
+    case 'edit':
+      // Check if the user may edit the comment, and has access to the input format
+      return comment_access('edit', $comment) && filter_access($comment->format);
+    case 'create':
+      // Check if the user may post comments, and has access to the used format and
+      // check if the node has comments enabled, and that the user has access to the node
+      return user_access('post comments') && filter_access($comment->format) &&
+        _comment_resource_node_access($comment->nid, COMMENT_NODE_READ_WRITE);
+    case 'delete':
+      // Check if the user may edit the comment
+      return comment_access('edit', $comment);
+  }
+}
+
+/**
+ * Access check callback for node comments relationship controller.
+ */
+function _comment_resource_node_comments_access($args) {
+  return user_access('access comments') && _comment_resource_node_access($args[0]);
+}
+
+/**
+ * Helper function for access checking.
+ *
+ * @param int $nid
+ * @param int $comment
+ */
+function _comment_resource_node_access($nid, $comment=COMMENT_NODE_READ_ONLY) {
+  /*
+   * TODO: Check if we really have to perform a full node load here,
+   * it could be enough to load nid, type, uid, comment, status, format.
+  */
+  // Check if the node has comments enabled, and that the user has access to the node
+  $node = node_load($nid);
+  return $node->comment >= $comment && node_access('view', $node);
+}
+

@@ -1,0 +1,7 @@
+; $Id$
+name = Comment Resource
+description = Provides a resource oriented service interface to comments.
+package = Services - services
+dependencies[] = query_builder
+core = 6.x
+php = 5.x
