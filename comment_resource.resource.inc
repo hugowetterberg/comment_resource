@@ -33,7 +33,7 @@ function _comment_resource_service_resource() {
             '#name' => 'node',
             '#optional' => FALSE,
             '#source' => 'data',
-            '#description' => 'The node object to create',
+            '#description' => 'The comment object to create',
             '#type' => 'struct',
           ),
         ),
