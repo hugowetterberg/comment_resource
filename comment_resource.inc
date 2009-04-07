@@ -35,6 +35,8 @@ function _comment_resource_create($comment) {
     $comment['format'] = filter_resolve_format(FILTER_FORMAT_DEFAULT);
   }
 
+  _comment_form_submit($comment);
+
   if ($cid = comment_save((array)$comment)) {
     return (object)array(
       'cid' => $cid,
