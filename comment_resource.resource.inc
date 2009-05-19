@@ -95,7 +95,7 @@ function _comment_resource_node_comments() {
       array(
         '#name' => 'fields',
         '#optional' => TRUE,
-        '#type' => 'int',
+        '#type' => 'array',
         '#description' => 'The fields to get.',
         '#default value' => 0,
         '#source' => array('param' => 'fields'),
@@ -103,7 +103,7 @@ function _comment_resource_node_comments() {
       array(
         '#name' => 'params',
         '#optional' => TRUE,
-        '#type' => 'int',
+        '#type' => 'struct',
         '#description' => 'Parameters for the query builder.',
         '#default value' => 0,
         '#source' => 'param',
