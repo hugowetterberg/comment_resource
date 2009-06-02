@@ -65,6 +65,7 @@ function _comment_resource_index() {
 function _comment_resource_node_index($nid, $page=0, $fields=array(), $parameters=array()) {
   $admin = user_access('administer comments');
   $builder = new CommentQueryBuilder($admin);
+  $parameters = (array)$parameters;
 
   if (is_string($fields)) {
     $fields = preg_split('/,\s?/', $fields);
