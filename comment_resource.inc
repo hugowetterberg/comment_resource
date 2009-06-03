@@ -6,7 +6,8 @@ function _comment_resource_retrieve($cid) {
   $comment = _comment_load($cid);
   $admin = user_access('administer comments');
 
-  if (!$admin && $comment->uid && $comment) {
+  $comment->mail_md5 = md5(strtolower($comment->mail));
+  if (!$admin && $comment) {
     unset($comment->hostname);
     unset($comment->mail);
   }
@@ -77,11 +78,23 @@ function _comment_resource_node_index($nid, $page=0, $fields=array(), $parameter
     $parameters['status'] = COMMENT_PUBLISHED;
   }
 
+  $md5 = array_search('mail_md5', $fields);
+  $mail_requested = array_search('mail', $fields) !== FALSE;
+  if ($md5 !== FALSE && !$mail_requested) {
+    $fields[] = 'mail';
+  }
+
   list($sql, $params) = $builder->query($fields, $parameters);
   $res = db_query_range($sql, $params, $page*20, 20);
 
   $comments = array();
   while ($comment = db_fetch_object($res)) {
+    if ($md5) {
+      $comment->mail_md5 = md5(strtolower($comment->mail));
+    }
+    if (!$admin || !$mail_requested) {
+      unset($comment->mail);
+    }
     $comment->uri = services_resource_uri(array('comment', $comment->cid));
     $comments[] = $comment;
   }

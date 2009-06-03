@@ -41,6 +41,9 @@ class CommentQueryBuilder extends QueryBuilder {
         'condition' => self::CONDITION_RANGE,
         'sortable' => TRUE,
       ),
+      'mail' => array(
+        'condition' => self::CONDITION_MATCH,
+      ),
       'format' => array(),
       'subject' => array(),
       'comment' => array(),
@@ -51,9 +54,6 @@ class CommentQueryBuilder extends QueryBuilder {
 
     if ($admin) {
       $table['hostname'] = array(
-        'condition' => self::CONDITION_MATCH,
-      );
-      $table['mail'] = array(
         'condition' => self::CONDITION_MATCH,
       );
     }
