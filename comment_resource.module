@@ -84,12 +84,6 @@ function _comment_resource_node_comments_access($args) {
  * @param int $comment
  */
 function _comment_resource_node_access($nid, $comment=COMMENT_NODE_READ_ONLY) {
-  /*
-   * TODO: Check if we really have to perform a full node load here,
-   * it could be enough to load nid, type, uid, comment, status, format.
-  */
-  // Check if the node has comments enabled, and that the user has access to the node
-  $node = node_load($nid);
-  return $node->comment >= $comment && node_access('view', $node);
+  return TRUE;
 }
 
